@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>GoalSync — Vivek & Tejal</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f7; color: #1a1a1a; min-height: 100vh; }
+  .app { max-width: 600px; margin: 0 auto; padding: 1rem; }
+  .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 0.5px solid #e0e0e0; background: #f5f5f7; position: sticky; top: 0; z-index: 10; padding-top: 0.5rem; }
+  .logo { font-size: 18px; font-weight: 600; color: #1a1a1a; }
+  .logo span { color: #7F77DD; }
+  .user-tabs { display: flex; gap: 6px; }
+  .user-tab { padding: 6px 14px; border-radius: 20px; border: 1px solid #ddd; font-size: 13px; cursor: pointer; background: white; color: #666; transition: all 0.2s; font-family: inherit; }
+  .user-tab.active { background: #7F77DD; color: white; border-color: #7F77DD; }
+  .nav-tabs { display: flex; margin-bottom: 1.25rem; border-bottom: 1px solid #e0e0e0; overflow-x: auto; }
+  .nav-tab { padding: 10px 16px; font-size: 13px; cursor: pointer; color: #888; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.2s; background: transparent; border-top: none; border-left: none; border-right: none; white-space: nowrap; font-family: inherit; }
+  .nav-tab.active { color: #7F77DD; border-bottom-color: #7F77DD; font-weight: 600; }
+  .card { background: white; border: 1px solid #ebebeb; border-radius: 14px; padding: 1rem 1.1rem; margin-bottom: 0.75rem; }
+  .ai-message { background: #EEEDFE; border: 1px solid #C5C1F0; border-radius: 14px; padding: 0.9rem 1.1rem; margin-bottom: 1rem; font-size: 14px; color: #3C3489; line-height: 1.6; }
+  .greeting { font-size: 22px; font-weight: 600; color: #1a1a1a; margin-bottom: 0.2rem; }
+  .date-line { font-size: 13px; color: #888; margin-bottom: 1rem; }
+  .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 1rem; }
+  .stat-card { background: white; border-radius: 12px; padding: 0.75rem; text-align: center; border: 1px solid #ebebeb; }
+  .stat-num { font-size: 24px; font-weight: 600; color: #1a1a1a; }
+  .stat-label { font-size: 11px; color: #888; margin-top: 2px; }
+  .section-title { font-size: 12px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.75rem; }
+  .task-item { display: flex; align-items: center; gap: 10px; padding: 0.7rem 0; border-bottom: 0.5px solid #f0f0f0; }
+  .task-item:last-child { border-bottom: none; }
+  .task-check { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid #ccc; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; background: white; }
+  .task-check.done { background: #1D9E75; border-color: #1D9E75; }
+  .task-check.done::after { content: ''; width: 5px; height: 9px; border: 2px solid white; border-top: none; border-left: none; transform: rotate(45deg) translateY(-2px); display: block; }
+  .task-body { flex: 1; min-width: 0; }
+  .task-title { font-size: 14px; color: #1a1a1a; }
+  .task-title.done { text-decoration: line-through; color: #aaa; }
+  .task-due { font-size: 11px; color: #aaa; margin-top: 1px; }
+  .task-owner { font-size: 11px; padding: 2px 7px; border-radius: 10px; font-weight: 600; flex-shrink: 0; }
+  .owner-vivek { background: #EEEDFE; color: #534AB7; }
+  .owner-tejal { background: #FEF3E2; color: #B07D2A; }
+  .owner-both { background: #E1F5EE; color: #0F6E56; }
+  .overdue-tag { font-size: 11px; color: #E24B4A; font-weight: 600; margin-left: 4px; }
+  .del-btn { background: none; border: none; color: #ccc; font-size: 16px; cursor: pointer; padding: 4px; flex-shrink: 0; }
+  .del-btn:hover { color: #E24B4A; }
+  .add-btn { display: flex; align-items: center; gap: 8px; padding: 0.65rem 1rem; border: 1.5px dashed #ddd; border-radius: 12px; font-size: 13px; color: #888; cursor: pointer; background: transparent; width: 100%; margin-top: 0.5rem; font-family: inherit; transition: all 0.2s; }
+  .add-btn:hover { background: #fafafa; border-color: #7F77DD; color: #7F77DD; }
+  .add-btn-sm { width: auto; }
+  .plus { font-size: 16px; color: #7F77DD; font-weight: 700; }
+  .goal-item { display: flex; align-items: flex-start; gap: 10px; padding: 0.7rem 0; border-bottom: 0.5px solid #f0f0f0; }
+  .goal-item:last-child { border-bottom: none; }
+  .goal-dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+  .progress-bar-wrap { height: 5px; background: #f0f0f0; border-radius: 3px; margin-top: 6px; }
+  .progress-bar { height: 5px; border-radius: 3px; transition: width 0.4s; }
+  .week-badge { font-size: 11px; padding: 2px 8px; background: #EEEDFE; color: #534AB7; border-radius: 10px; margin-left: 8px; font-weight: 600; }
+  .chat-box { background: #f9f9f9; border-radius: 14px; padding: 1rem; margin-bottom: 1rem; min-height: 220px; max-height: 340px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+  .msg { padding: 9px 13px; border-radius: 14px; font-size: 13px; line-height: 1.55; max-width: 82%; word-break: break-word; }
+  .msg.ai { background: #EEEDFE; color: #3C3489; align-self: flex-start; border-bottom-left-radius: 4px; }
+  .msg.user-vivek { background: #7F77DD; color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
+  .msg.user-tejal { background: #EF9F27; color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
+  .chat-bar { display: flex; gap: 8px; align-items: center; }
+  .chat-input { flex: 1; padding: 11px 16px; border: 1px solid #ddd; border-radius: 24px; font-size: 14px; background: white; color: #1a1a1a; outline: none; font-family: inherit; }
+  .chat-input:focus { border-color: #7F77DD; }
+  .chat-send { padding: 11px 18px; background: #7F77DD; color: white; border: none; border-radius: 24px; font-size: 13px; cursor: pointer; font-weight: 600; font-family: inherit; transition: background 0.2s; }
+  .chat-send:hover { background: #534AB7; }
+  .modal-bg { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.45); display: flex; align-items: flex-end; justify-content: center; z-index: 200; }
+  .modal { background: white; border-radius: 20px 20px 0 0; padding: 1.5rem; width: 100%; max-width: 600px; }
+  .modal h3 { font-size: 17px; font-weight: 600; margin-bottom: 1rem; }
+  .modal input, .modal select, .modal textarea { width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 10px; font-size: 14px; background: white; color: #1a1a1a; margin-bottom: 0.75rem; outline: none; font-family: inherit; -webkit-appearance: none; }
+  .modal input:focus, .modal select:focus, .modal textarea:focus { border-color: #7F77DD; }
+  .modal textarea { height: 75px; resize: none; }
+  .modal-btns { display: flex; gap: 8px; justify-content: flex-end; margin-top: 0.25rem; }
+  .btn-cancel { padding: 10px 18px; border: 1px solid #ddd; border-radius: 10px; font-size: 14px; cursor: pointer; background: white; color: #666; font-family: inherit; }
+  .btn-save { padding: 10px 20px; background: #7F77DD; color: white; border: none; border-radius: 10px; font-size: 14px; cursor: pointer; font-weight: 600; font-family: inherit; }
+  .sync-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #ccc; margin-right: 5px; }
+  .sync-dot.synced { background: #1D9E75; }
+  .sync-dot.error { background: #E24B4A; }
+  .sync-label { font-size: 11px; color: #aaa; }
+  .empty-state { text-align: center; padding: 2rem 1rem; color: #aaa; font-size: 13px; line-height: 1.6; }
+  .loading-state { text-align: center; padding: 1.5rem; color: #bbb; font-size: 13px; }
+  .row-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+  .row-header-title { font-size: 16px; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="logo"><span>&#9670;</span> GoalSync</div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div><span class="sync-dot" id="sync-dot"></span><span class="sync-label" id="sync-label">connecting...</span></div>
+      <div class="user-tabs">
+        <button class="user-tab active" onclick="setUser('vivek',this)">Vivek</button>
+        <button class="user-tab" onclick="setUser('tejal',this)">Tejal</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showTab('today',this)">Today</button>
+    <button class="nav-tab" onclick="showTab('week',this)">This week</button>
+    <button class="nav-tab" onclick="showTab('goals',this)">Goals</button>
+    <button class="nav-tab" onclick="showTab('chat',this)">Ask me</button>
+  </div>
+
+  <div id="tab-today">
+    <div class="greeting" id="greeting">Good morning, Vivek!</div>
+    <div class="date-line" id="dateline"></div>
+    <div class="ai-message" id="daily-msg">Loading your daily briefing...</div>
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-num" id="s-done">0</div><div class="stat-label">Done today</div></div>
+      <div class="stat-card"><div class="stat-num" id="s-pending">0</div><div class="stat-label">Pending</div></div>
+      <div class="stat-card"><div class="stat-num" id="s-week">0%</div><div class="stat-label">Week progress</div></div>
+    </div>
+    <div class="section-title">Today's tasks</div>
+    <div class="card" id="today-list"><div class="loading-state">Loading...</div></div>
+    <button class="add-btn" onclick="openTaskModal()"><span class="plus">+</span> Add a task</button>
+  </div>
+
+  <div id="tab-week" style="display:none;">
+    <div class="row-header">
+      <div class="row-header-title">Week plan <span class="week-badge" id="week-num">Week 1</span></div>
+      <button class="add-btn add-btn-sm" onclick="openTaskModal()"><span class="plus">+</span> Add</button>
+    </div>
+    <div class="card" id="week-list"><div class="loading-state">Loading...</div></div>
+  </div>
+
+  <div id="tab-goals" style="display:none;">
+    <div class="row-header">
+      <div class="row-header-title">12-week goals</div>
+      <button class="add-btn add-btn-sm" onclick="openGoalModal()"><span class="plus">+</span> Add</button>
+    </div>
+    <div id="goals-list"><div class="loading-state">Loading...</div></div>
+  </div>
+
+  <div id="tab-chat" style="display:none;">
+    <div class="chat-box" id="chat-box"></div>
+    <div class="chat-bar">
+      <input class="chat-input" id="chat-input" placeholder="Ask me anything... I won't judge. Much." />
+      <button class="chat-send" onclick="sendChat()">Send</button>
+    </div>
+  </div>
+</div>
+
+<div id="task-modal" style="display:none;" class="modal-bg" onclick="if(event.target===this)closeModals()">
+  <div class="modal">
+    <h3>New task</h3>
+    <input type="text" id="t-title" placeholder="What needs doing?" />
+    <select id="t-owner"><option value="vivek">Vivek</option><option value="tejal">Tejal</option><option value="both">Both</option></select>
+    <input type="date" id="t-due" />
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModals()">Cancel</button>
+      <button class="btn-save" onclick="saveTask()">Add task</button>
+    </div>
+  </div>
+</div>
+
+<div id="goal-modal" style="display:none;" class="modal-bg" onclick="if(event.target===this)closeModals()">
+  <div class="modal">
+    <h3>New 12-week goal</h3>
+    <input type="text" id="g-title" placeholder="What's the goal?" />
+    <textarea id="g-desc" placeholder="A bit more detail (optional)..."></textarea>
+    <select id="g-owner"><option value="vivek">Vivek</option><option value="tejal">Tejal</option><option value="both">Both</option></select>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModals()">Cancel</button>
+      <button class="btn-save" onclick="saveGoal()">Add goal</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = 'https://script.google.com/macros/s/AKfycbxS3hn5v7mOCzRz35Iq323tRS90dItBqvX3fSzknhrZVhKnXwj7yg0o6MTEdHWu4Y9M/exec';
+const CLAUDE_API = 'https://api.anthropic.com/v1/messages';
+const GOAL_COLORS = ['#7F77DD','#1D9E75','#EF9F27','#D85A30','#378ADD','#D4537E'];
+const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+let currentUser = 'vivek';
+let tasks = [];
+let goals = [];
+let chatHistory = [];
+let chatInitialized = false;
+
+async function apiCall(params) {
+  const url = API + '?' + new URLSearchParams(params);
+  const res = await fetch(url);
+  const data = await res.json();
+  return data.data || [];
+}
+
+async function apiPost(body) {
+  const res = await fetch(API, { method: 'POST', body: JSON.stringify(body) });
+  return res.json();
+}
+
+async function loadAll() {
+  setSync('loading');
+  try {
+    const [t, g] = await Promise.all([
+      apiCall({ action: 'read', sheet: 'tasks' }),
+      apiCall({ action: 'read', sheet: 'goals' })
+    ]);
+    tasks = (t || []).map(x => ({ ...x, done: x.done === 'TRUE' || x.done === true }));
+    goals = g || [];
+    setSync('synced');
+    renderAll();
+  } catch(e) {
+    setSync('error');
+  }
+}
+
+function setSync(s) {
+  const dot = document.getElementById('sync-dot');
+  const lbl = document.getElementById('sync-label');
+  dot.className = 'sync-dot' + (s === 'synced' ? ' synced' : s === 'error' ? ' error' : '');
+  lbl.textContent = s === 'synced' ? 'synced' : s === 'error' ? 'offline' : 'syncing...';
+}
+
+function getWeekNum() {
+  const start = new Date('2025-03-10');
+  return Math.max(1, Math.min(12, Math.ceil((new Date() - start) / (7*24*60*60*1000))));
+}
+
+function setUser(u, el) {
+  currentUser = u;
+  document.querySelectorAll('.user-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderAll();
+}
+
+function showTab(t, el) {
+  ['today','week','goals','chat'].forEach(tab => {
+    document.getElementById('tab-'+tab).style.display = tab === t ? 'block' : 'none';
+  });
+  document.querySelectorAll('.nav-tab').forEach(n => n.classList.remove('active'));
+  el.classList.add('active');
+  if (t === 'chat' && !chatInitialized) { chatInitialized = true; initChat(); }
+}
+
+function myTasks() { return tasks.filter(t => t.owner === currentUser || t.owner === 'both'); }
+
+function todayTasks() {
+  const today = new Date().toDateString();
+  return myTasks().filter(t => {
+    if (!t.due) return true;
+    const d = new Date(t.due);
+    return d.toDateString() === today || (d < new Date() && !t.done);
+  });
+}
+
+function weekPct() {
+  const all = myTasks();
+  return all.length ? Math.round(all.filter(t => t.done).length / all.length * 100) : 0;
+}
+
+function renderGreeting() {
+  const h = new Date().getHours();
+  const name = currentUser === 'vivek' ? 'Vivek' : 'Tejal';
+  const tod = h < 12 ? 'morning' : h < 17 ? 'afternoon' : 'evening';
+  document.getElementById('greeting').textContent = 'Good ' + tod + ', ' + name + '!';
+  const now = new Date();
+  document.getElementById('dateline').textContent = DAYS[now.getDay()] + ', ' + now.getDate() + ' ' + MONTHS[now.getMonth()] + ' · Week ' + getWeekNum() + ' of 12';
+  document.getElementById('week-num').textContent = 'Week ' + getWeekNum();
+}
+
+function renderDailyMsg() {
+  const name = currentUser === 'vivek' ? 'Vivek' : 'Tejal';
+  const pending = todayTasks().filter(t => !t.done).length;
+  const done = todayTasks().filter(t => t.done).length;
+  const pct = weekPct();
+  const msgs = [
+    'Alright ' + name + ', ' + pending + ' tasks are waiting. They\'ve been patient. Don\'t push it.',
+    done + ' done, ' + pending + ' to go. The scoreboard is watching, ' + name + '.',
+    'Week ' + getWeekNum() + ' is ' + pct + '% done. ' + (pct < 40 ? 'Plenty of room for redemption.' : pct < 70 ? 'Decent. Don\'t coast now.' : 'Strong week. Finish it properly.'),
+    pending === 0 ? 'Everything\'s done, ' + name + '? Either you\'re crushing it or forgot to add tasks. Suspicious either way.' : pending + ' task' + (pending > 1 ? 's' : '') + ' on deck. ' + (pending > 4 ? 'Less planning, more doing.' : 'Totally manageable. No excuses.')
+  ];
+  document.getElementById('daily-msg').textContent = msgs[Math.floor(Math.random() * msgs.length)];
+}
+
+function renderStats() {
+  const td = todayTasks();
+  document.getElementById('s-done').textContent = td.filter(t => t.done).length;
+  document.getElementById('s-pending').textContent = td.filter(t => !t.done).length;
+  document.getElementById('s-week').textContent = weekPct() + '%';
+}
+
+function ownerBadge(o) {
+  if (o === 'both') return '<span class="task-owner owner-both">Both</span>';
+  if (o === 'vivek') return '<span class="task-owner owner-vivek">Vivek</span>';
+  return '<span class="task-owner owner-tejal">Tejal</span>';
+}
+
+function taskRow(t, showOwner) {
+  const overdue = t.due && new Date(t.due) < new Date() && !t.done;
+  return '<div class="task-item">' +
+    '<div class="task-check ' + (t.done ? 'done' : '') + '" onclick="toggleTask(\'' + t.id + '\')"></div>' +
+    '<div class="task-body">' +
+      '<span class="task-title ' + (t.done ? 'done' : '') + '">' + t.title + '</span>' +
+      (overdue ? '<span class="overdue-tag"> overdue!</span>' : '') +
+      (t.due ? '<div class="task-due">Due ' + t.due + '</div>' : '') +
+    '</div>' +
+    (showOwner ? ownerBadge(t.owner) : '') +
+    '<button class="del-btn" onclick="deleteTask(\'' + t.id + '\')">&#x2715;</button>' +
+  '</div>';
+}
+
+function renderTodayTasks() {
+  const list = todayTasks();
+  document.getElementById('today-list').innerHTML = list.length
+    ? list.map(t => taskRow(t, false)).join('')
+    : '<div class="empty-state">No tasks for today.<br>Either you\'re incredibly organised or you haven\'t added anything yet.</div>';
+}
+
+function renderWeekTasks() {
+  const list = myTasks();
+  document.getElementById('week-list').innerHTML = list.length
+    ? list.map(t => taskRow(t, true)).join('')
+    : '<div class="empty-state">Empty week plan.<br>Bold strategy. Let\'s see how that works out.</div>';
+}
+
+function renderGoals() {
+  const el = document.getElementById('goals-list');
+  if (!goals.length) {
+    el.innerHTML = '<div class="empty-state">No goals yet.<br>Add one — the 12-week clock is ticking.</div>';
+    return;
+  }
+  el.innerHTML = goals.map(function(g, i) {
+    const color = GOAL_COLORS[i % GOAL_COLORS.length];
+    const relTasks = tasks.filter(t => t.goalId === g.id);
+    const pct = relTasks.length ? Math.round(relTasks.filter(t => t.done).length / relTasks.length * 100) : 0;
+    const ownerLabel = g.owner === 'both' ? 'Vivek & Tejal' : g.owner === 'vivek' ? 'Vivek' : 'Tejal';
+    return '<div class="card"><div class="goal-item">' +
+      '<div class="goal-dot" style="background:' + color + '"></div>' +
+      '<div style="flex:1;">' +
+        '<div style="font-size:14px;font-weight:600;">' + g.title + '</div>' +
+        '<div style="font-size:12px;color:#aaa;margin-top:1px;">' + (g.desc ? g.desc + ' · ' : '') + ownerLabel + '</div>' +
+        '<div class="progress-bar-wrap"><div class="progress-bar" style="width:' + pct + '%;background:' + color + '"></div></div>' +
+        '<div style="font-size:11px;color:#aaa;margin-top:3px;">' + pct + '% complete</div>' +
+      '</div>' +
+      '<button class="del-btn" onclick="deleteGoal(\'' + g.id + '\')">&#x2715;</button>' +
+    '</div></div>';
+  }).join('');
+}
+
+function renderAll() {
+  renderGreeting();
+  renderDailyMsg();
+  renderStats();
+  renderTodayTasks();
+  renderWeekTasks();
+  renderGoals();
+}
+
+async function toggleTask(id) {
+  const t = tasks.find(t => t.id === id);
+  if (!t) return;
+  t.done = !t.done;
+  renderAll();
+  setSync('loading');
+  await apiPost({ action: 'update', sheet: 'tasks', id, data: { done: t.done ? 'TRUE' : 'FALSE' } });
+  setSync('synced');
+}
+
+async function deleteTask(id) {
+  tasks = tasks.filter(t => t.id !== id);
+  renderAll();
+  setSync('loading');
+  await apiPost({ action: 'delete', sheet: 'tasks', id });
+  setSync('synced');
+}
+
+async function deleteGoal(id) {
+  goals = goals.filter(g => g.id !== id);
+  renderAll();
+  setSync('loading');
+  await apiPost({ action: 'delete', sheet: 'goals', id });
+  setSync('synced');
+}
+
+function openTaskModal() {
+  document.getElementById('t-title').value = '';
+  document.getElementById('t-owner').value = currentUser;
+  document.getElementById('t-due').value = '';
+  document.getElementById('task-modal').style.display = 'flex';
+  setTimeout(() => document.getElementById('t-title').focus(), 100);
+}
+
+function openGoalModal() {
+  document.getElementById('g-title').value = '';
+  document.getElementById('g-desc').value = '';
+  document.getElementById('g-owner').value = currentUser;
+  document.getElementById('goal-modal').style.display = 'flex';
+  setTimeout(() => document.getElementById('g-title').focus(), 100);
+}
+
+function closeModals() {
+  document.getElementById('task-modal').style.display = 'none';
+  document.getElementById('goal-modal').style.display = 'none';
+}
+
+async function saveTask() {
+  const title = document.getElementById('t-title').value.trim();
+  if (!title) return;
+  const task = { id: Date.now().toString(), title, owner: document.getElementById('t-owner').value, due: document.getElementById('t-due').value, done: 'FALSE', goalId: '', createdAt: new Date().toISOString() };
+  tasks.push({ ...task, done: false });
+  closeModals(); renderAll();
+  setSync('loading');
+  await apiPost({ action: 'write', sheet: 'tasks', data: task });
+  setSync('synced');
+}
+
+async function saveGoal() {
+  const title = document.getElementById('g-title').value.trim();
+  if (!title) return;
+  const goal = { id: Date.now().toString(), title, desc: document.getElementById('g-desc').value.trim(), owner: document.getElementById('g-owner').value, createdAt: new Date().toISOString() };
+  goals.push(goal);
+  closeModals(); renderAll();
+  setSync('loading');
+  await apiPost({ action: 'write', sheet: 'goals', data: goal });
+  setSync('synced');
+}
+
+function addMsg(text, type) {
+  const box = document.getElementById('chat-box');
+  const div = document.createElement('div');
+  div.className = 'msg ' + type;
+  div.textContent = text;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+  return div;
+}
+
+function initChat() {
+  const name = currentUser === 'vivek' ? 'Vivek' : 'Tejal';
+  const intro = 'Hey ' + name + '! GoalSync coordinator here — part coach, part accountability partner, mostly entertainment. I can see your goals and tasks. What do you want to tackle?';
+  addMsg(intro, 'ai');
+  chatHistory.push({ role: 'assistant', content: intro });
+}
+
+async function sendChat() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  const name = currentUser === 'vivek' ? 'Vivek' : 'Tejal';
+  addMsg(text, 'user-' + currentUser);
+  chatHistory.push({ role: 'user', content: text });
+
+  const typing = addMsg('thinking...', 'ai');
+  typing.style.opacity = '0.5';
+
+  const taskSummary = tasks.length ? tasks.map(t => '"' + t.title + '" [' + t.owner + '] [' + (t.done ? 'done' : 'pending') + ']' + (t.due ? ' due ' + t.due : '')).join('; ') : 'no tasks yet';
+  const goalSummary = goals.length ? goals.map(g => '"' + g.title + '" [' + g.owner + ']').join('; ') : 'no goals yet';
+  const system = 'You are a witty, slightly sarcastic but genuinely warm goal coordinator for Vivek and Tejal, a team working on 12-week goals. You tease them, use dry humor, keep them focused and accountable. Current user: ' + name + '. Week ' + getWeekNum() + ' of 12. Tasks: ' + taskSummary + '. Goals: ' + goalSummary + '. Week progress: ' + weekPct() + '%. Keep responses concise and punchy — max 3 sentences. Be funny. Be direct. Be helpful.';
+
+  try {
+    const res = await fetch(CLAUDE_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1000, system, messages: chatHistory })
+    });
+    const data = await res.json();
+    typing.remove();
+    const reply = data.content && data.content[0] ? data.content[0].text : "I'd respond but I'm busy judging your task list.";
+    addMsg(reply, 'ai');
+    chatHistory.push({ role: 'assistant', content: reply });
+  } catch(e) {
+    typing.remove();
+    addMsg('Connection hiccup. Even coordinators have bad days. Try again.', 'ai');
+  }
+}
+
+document.getElementById('chat-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') sendChat();
+});
+
+loadAll();
+setInterval(loadAll, 30000);
+</script>
+</body>
+</html>
