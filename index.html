@@ -8,7 +8,7 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f7; color: #1a1a1a; min-height: 100vh; }
   .app { max-width: 600px; margin: 0 auto; padding: 1rem; }
-  .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 0.5px solid #e0e0e0; background: #f5f5f7; position: sticky; top: 0; z-index: 10; padding-top: 0.5rem; }
+  .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; padding-bottom: 1rem; padding-top: 0.5rem; border-bottom: 0.5px solid #e0e0e0; background: #f5f5f7; position: sticky; top: 0; z-index: 10; }
   .logo { font-size: 18px; font-weight: 600; color: #1a1a1a; }
   .logo span { color: #7F77DD; }
   .user-tabs { display: flex; gap: 6px; }
@@ -52,7 +52,7 @@
   .progress-bar-wrap { height: 5px; background: #f0f0f0; border-radius: 3px; margin-top: 6px; }
   .progress-bar { height: 5px; border-radius: 3px; transition: width 0.4s; }
   .week-badge { font-size: 11px; padding: 2px 8px; background: #EEEDFE; color: #534AB7; border-radius: 10px; margin-left: 8px; font-weight: 600; }
-  .chat-box { background: #f9f9f9; border-radius: 14px; padding: 1rem; margin-bottom: 1rem; min-height: 220px; max-height: 340px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+  .chat-box { background: #f9f9f9; border-radius: 14px; padding: 1rem; margin-bottom: 1rem; min-height: 220px; max-height: 380px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
   .msg { padding: 9px 13px; border-radius: 14px; font-size: 13px; line-height: 1.55; max-width: 82%; word-break: break-word; }
   .msg.ai { background: #EEEDFE; color: #3C3489; align-self: flex-start; border-bottom-left-radius: 4px; }
   .msg.user-vivek { background: #7F77DD; color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
@@ -60,21 +60,20 @@
   .chat-bar { display: flex; gap: 8px; align-items: center; }
   .chat-input { flex: 1; padding: 11px 16px; border: 1px solid #ddd; border-radius: 24px; font-size: 14px; background: white; color: #1a1a1a; outline: none; font-family: inherit; }
   .chat-input:focus { border-color: #7F77DD; }
-  .chat-send { padding: 11px 18px; background: #7F77DD; color: white; border: none; border-radius: 24px; font-size: 13px; cursor: pointer; font-weight: 600; font-family: inherit; transition: background 0.2s; }
+  .chat-send { padding: 11px 18px; background: #7F77DD; color: white; border: none; border-radius: 24px; font-size: 13px; cursor: pointer; font-weight: 600; font-family: inherit; }
   .chat-send:hover { background: #534AB7; }
   .modal-bg { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.45); display: flex; align-items: flex-end; justify-content: center; z-index: 200; }
   .modal { background: white; border-radius: 20px 20px 0 0; padding: 1.5rem; width: 100%; max-width: 600px; }
   .modal h3 { font-size: 17px; font-weight: 600; margin-bottom: 1rem; }
   .modal input, .modal select, .modal textarea { width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 10px; font-size: 14px; background: white; color: #1a1a1a; margin-bottom: 0.75rem; outline: none; font-family: inherit; -webkit-appearance: none; }
-  .modal input:focus, .modal select:focus, .modal textarea:focus { border-color: #7F77DD; }
   .modal textarea { height: 75px; resize: none; }
   .modal-btns { display: flex; gap: 8px; justify-content: flex-end; margin-top: 0.25rem; }
   .btn-cancel { padding: 10px 18px; border: 1px solid #ddd; border-radius: 10px; font-size: 14px; cursor: pointer; background: white; color: #666; font-family: inherit; }
   .btn-save { padding: 10px 20px; background: #7F77DD; color: white; border: none; border-radius: 10px; font-size: 14px; cursor: pointer; font-weight: 600; font-family: inherit; }
-  .sync-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #ccc; margin-right: 5px; }
+  .sync-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #ccc; margin-right: 5px; vertical-align: middle; }
   .sync-dot.synced { background: #1D9E75; }
   .sync-dot.error { background: #E24B4A; }
-  .sync-label { font-size: 11px; color: #aaa; }
+  .sync-label { font-size: 11px; color: #aaa; vertical-align: middle; }
   .empty-state { text-align: center; padding: 2rem 1rem; color: #aaa; font-size: 13px; line-height: 1.6; }
   .loading-state { text-align: center; padding: 1.5rem; color: #bbb; font-size: 13px; }
   .row-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
@@ -167,8 +166,7 @@
 </div>
 
 <script>
-const API = 'https://script.google.com/macros/s/AKfycbxS3hn5v7mOCzRz35Iq323tRS90dItBqvX3fSzknhrZVhKnXwj7yg0o6MTEdHWu4Y9M/exec';
-const CLAUDE_API = 'https://api.anthropic.com/v1/messages';
+const API = 'https://script.google.com/macros/s/AKfycbzdzELHtzaiLpU9-0R6wdQcaeyWsqquqUqvGthvtw4eGiHKN7DrjNvSrpXjekJoDtCI/exec';
 const GOAL_COLORS = ['#7F77DD','#1D9E75','#EF9F27','#D85A30','#378ADD','#D4537E'];
 const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -179,7 +177,7 @@ let goals = [];
 let chatHistory = [];
 let chatInitialized = false;
 
-async function apiCall(params) {
+async function apiGet(params) {
   const url = API + '?' + new URLSearchParams(params);
   const res = await fetch(url);
   const data = await res.json();
@@ -187,7 +185,11 @@ async function apiCall(params) {
 }
 
 async function apiPost(body) {
-  const res = await fetch(API, { method: 'POST', body: JSON.stringify(body) });
+  const res = await fetch(API, {
+    method: 'POST',
+    body: JSON.stringify(body),
+    headers: { 'Content-Type': 'text/plain' }
+  });
   return res.json();
 }
 
@@ -195,8 +197,8 @@ async function loadAll() {
   setSync('loading');
   try {
     const [t, g] = await Promise.all([
-      apiCall({ action: 'read', sheet: 'tasks' }),
-      apiCall({ action: 'read', sheet: 'goals' })
+      apiGet({ action: 'read', sheet: 'tasks' }),
+      apiGet({ action: 'read', sheet: 'goals' })
     ]);
     tasks = (t || []).map(x => ({ ...x, done: x.done === 'TRUE' || x.done === true }));
     goals = g || [];
@@ -270,7 +272,9 @@ function renderDailyMsg() {
     'Alright ' + name + ', ' + pending + ' tasks are waiting. They\'ve been patient. Don\'t push it.',
     done + ' done, ' + pending + ' to go. The scoreboard is watching, ' + name + '.',
     'Week ' + getWeekNum() + ' is ' + pct + '% done. ' + (pct < 40 ? 'Plenty of room for redemption.' : pct < 70 ? 'Decent. Don\'t coast now.' : 'Strong week. Finish it properly.'),
-    pending === 0 ? 'Everything\'s done, ' + name + '? Either you\'re crushing it or forgot to add tasks. Suspicious either way.' : pending + ' task' + (pending > 1 ? 's' : '') + ' on deck. ' + (pending > 4 ? 'Less planning, more doing.' : 'Totally manageable. No excuses.')
+    pending === 0
+      ? 'Everything\'s done, ' + name + '? Either you\'re crushing it or forgot to add tasks. Suspicious either way.'
+      : pending + ' task' + (pending > 1 ? 's' : '') + ' on deck. ' + (pending > 4 ? 'Less planning, more doing.' : 'Totally manageable. No excuses.')
   ];
   document.getElementById('daily-msg').textContent = msgs[Math.floor(Math.random() * msgs.length)];
 }
@@ -430,7 +434,7 @@ function addMsg(text, type) {
 
 function initChat() {
   const name = currentUser === 'vivek' ? 'Vivek' : 'Tejal';
-  const intro = 'Hey ' + name + '! GoalSync coordinator here — part coach, part accountability partner, mostly entertainment. I can see your goals and tasks. What do you want to tackle?';
+  const intro = 'Hey ' + name + '! GoalSync coordinator here — part coach, part accountability partner, mostly entertainment. What do you want to tackle?';
   addMsg(intro, 'ai');
   chatHistory.push({ role: 'assistant', content: intro });
 }
@@ -452,14 +456,9 @@ async function sendChat() {
   const system = 'You are a witty, slightly sarcastic but genuinely warm goal coordinator for Vivek and Tejal, a team working on 12-week goals. You tease them, use dry humor, keep them focused and accountable. Current user: ' + name + '. Week ' + getWeekNum() + ' of 12. Tasks: ' + taskSummary + '. Goals: ' + goalSummary + '. Week progress: ' + weekPct() + '%. Keep responses concise and punchy — max 3 sentences. Be funny. Be direct. Be helpful.';
 
   try {
-    const res = await fetch(CLAUDE_API, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1000, system, messages: chatHistory })
-    });
-    const data = await res.json();
+    const result = await apiPost({ action: 'chat', messages: chatHistory, system });
     typing.remove();
-    const reply = data.content && data.content[0] ? data.content[0].text : "I'd respond but I'm busy judging your task list.";
+    const reply = (result && result.data) ? result.data : "I'd respond but something went sideways.";
     addMsg(reply, 'ai');
     chatHistory.push({ role: 'assistant', content: reply });
   } catch(e) {
